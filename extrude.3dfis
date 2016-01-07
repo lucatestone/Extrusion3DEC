@@ -1,0 +1,51 @@
+def extrude(geom_set, zcoord, filename)
+; Code by Itasca
+; Function to create 3DEC blocks from a geometry surface
+; by extruding in the z direction
+;
+; commands will be written to a file for reading
+;
+; INPUT: geom_set - the name of the geometry set to be extruded (string)
+;        zcoord   - z coordinate for the end of the extrusion (float)
+;        filename - name of file to hold poly commands (string)
+
+  status = open(filename,1,1)
+  if status > 0
+    local io = out(filename+' could not be opened for writing.  Status = '+string(status))
+    exit
+  end_if
+  
+  ; array for writing lines to a file
+  file_line = get_array(1)
+
+
+  local gset = gset_find(geom_set)
+  loop foreach local gpol gpol_list(gset)
+;    if gpol_check(gpol) = 1  ; polygon is valid
+    
+      ; a side of prism
+      file_line(1) = 'poly prism a '
+      loop i (1,gpol_size(gpol))
+        gn = gpol_node(gpol,i)
+        gnpos = gn_pos(gn)
+        file_line(1) = file_line(1) + string(gnpos)+' ' 
+      end_loop
+      file_line(1) = file_line(1) + '...'
+      status = write(file_line,1)  
+      
+      ; b side of prism
+      file_line(1) = ' b '
+      loop i (1,gpol_size(gpol))
+        gn = gpol_node(gpol,i)
+        gnpos = gn_pos(gn)
+        newpos = vector(xcomp(gnpos),ycomp(gnpos),zcoord)
+        file_line(1) = file_line(1) + string(newpos)+' '
+      end_loop
+      status = write(file_line,1)     
+;    else ; invalid polygon
+;      status = out('Invalid polygon: '+string(gpol_id(gpol)))
+;    end_if
+  end_loop
+  
+  status = close
+end
