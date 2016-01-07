@@ -1,0 +1,7 @@
+new
+geometry import some_stl.stl
+;some_stl.stl is the input file which has to be in the current project folder
+call extrude.3dfis
+@extrude('some_stl',extrusionDownToAltitude,'blocks.3ddat')
+;extrusionDownToAltitude is a float number, has to be lower than the lowest point contained in the file some_stl.stl
+call blocks
